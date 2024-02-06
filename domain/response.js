@@ -13,3 +13,5 @@ class HttpResponse {
         this.timeStamp = new Date().toLocaleString();
     }
 }
+
+module.exports = HttpResponse

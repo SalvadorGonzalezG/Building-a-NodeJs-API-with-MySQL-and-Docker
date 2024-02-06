@@ -10,3 +10,5 @@ const Code = {
 
     //Objet.freeze() lo utilizamos para evitar modificaciones en el codigo, es decir sea inmutable.
 Object.freeze(Code);
+
+module.exports = Code

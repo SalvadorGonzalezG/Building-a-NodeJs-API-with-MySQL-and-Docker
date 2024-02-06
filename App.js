@@ -1,6 +1,9 @@
 const express = require("express");
 const ip = require("ip")
 const cors = require("cors")
+const HttpResponse = require("./domain/response")
+const Code = require("./enum/code.enum")
+const Status = require("./enum/status.enum") 
 
 //La clase App tiene un constructor que inicializa la aplicacion de express
 // y luego llama a los metodos middleware y routes.
@@ -31,9 +34,9 @@ class App {
   routes(){
     this.app.use('/patients', (req,res) => {});
     // manejador de solicitud GET para la ruta raiz('/') que devuelve un msj con un estado HTTP 200
-    this.app.get('/', (req, res) => res.status(200).send({ message: 'Server is on'}))
+    this.app.get('/', (req, res) => res.status(Code.OK).send( new HttpResponse(Code.OK, Status.OK, 'Welcome to the patients API V1.0')))
     // Maneja todas las solicitudes a cualquier otra ruta que no este definida anteriormente, en ete caso devuelve un msh indicando que la ruta no se encontro status(404) con un msj definido en la propiedad 'ROUTE_NOT_FOUND' de la instancia de la clase.
-    this.app.all('*', (req, res) => res.status(404).send({ message: this.ROUTE_NOT_FOUND }));
+    this.app.all('*', (req, res) => res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, this.ROUTE_NOT_FOUND)));
   }
 }
 

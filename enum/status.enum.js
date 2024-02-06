@@ -8,3 +8,4 @@ const Status = {
 };
     // metodo de js que se utiliza para que el objeto sea inmutable, no se puede agregar, eliminar o modificar propiedades existentes en el objeto.
 Object.freeze(Status);
+module.exports = Status

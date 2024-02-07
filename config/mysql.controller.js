@@ -20,4 +20,5 @@
         // La funcion devuelve el grupo de conexiones para que pueda ser utilizado en otras partes de la aplicacion para realizar consultas a la DB.
         return pool
     }
+    module.exports = connection
 

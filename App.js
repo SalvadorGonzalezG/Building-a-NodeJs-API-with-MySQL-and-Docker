@@ -1,4 +1,4 @@
-const { express, Request, Response } = require("express");
+const  express  = require("express");
 const ip = require("ip")
 const cors = require("cors")
 const HttpResponse = require("./domain/response")
@@ -27,7 +27,7 @@ class App {
   // metodo llamado en la inicializacion de la aplicacion de express
   // utiliza el middleware 'cors' que permitiran todas las solicitudes desde cuaquier origen
     _middleware(){
-        this.app.use(cors({ origin: '*'}));
+        this.app.use(cors({origin: '*'}));
         // analiza el cuerpo de las solicitudes entrantes con json
         this.app.use(express.json());
   }

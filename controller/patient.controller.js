@@ -1,7 +1,7 @@
 const {Request, Response} = require("express")
 const Patient = require("../interface/patient")
-const { connection } = require("../config/mysql.controller")
-const { QUERY } = require("../query/patient.query")
+const connection = require("../config/mysql.config")
+const QUERY  = require("../query/patient.query")
 const Code = require("../enum/code.enum")
 const HttpResponse = require("../domain/response")
 const Status = require("../enum/status.enum")
@@ -54,7 +54,7 @@ const getPatient = async (req = Request, res = Response) => {
     }
 };
 
-export const createPatient = async (req = Request, res=  Response) => {
+const createPatient = async (req = Request, res=  Response) => {
     console.info(`[${new Date().toLocaleString()}] Incoming ${req.method}${req.originalUrl} Request from ${req.rawHeaders[0]} ${req.rawHeaders[1]}`)
     // Crea una copia del objeto req.body siendo estos los datos de la solicitud y lo asigna a la variable patient.
     let patient = { ...req.body}

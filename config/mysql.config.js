@@ -7,7 +7,7 @@
     // Carga las variables de entorno definidas en un archivo .env
     dotenv.config();
     // f: llamada connection f: asincrona devuelve una promesa establece una conexion a la DB MySQL
-    export const connection = async () => {
+    const connection = async () => {
     // crea un grupoo de conexiones a la DB MySQL utilizando las variables de entorno cargadas desde el archivo .env
         const pool = await createPool({
             host: process.env.DB_HOST,

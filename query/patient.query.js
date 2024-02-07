@@ -1,6 +1,6 @@
 
 //Objeto llamado QUERY, el cual contiene diferentes consultas SQL, utilizadas para interactuar con una tabla llamada patients en una DB.  
-export const QUERY = {
+const QUERY = {
     //Selec todos los pacientes ordenados por fecha de creacion de forma DECENDENTE y limitar el resultado a 50 registros.
     SELECT_PATIENTS: 'SELECT * FROM patients ORDER BY created_at DESC LIMIT 50',
     //Selec todos los datos de un paciente especifico basado en su ID.

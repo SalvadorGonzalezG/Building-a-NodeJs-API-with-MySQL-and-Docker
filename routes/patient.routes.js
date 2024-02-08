@@ -1,9 +1,9 @@
 const Router = require("express")
 const { getPatients, getPatient, createPatient, updatePatient, deletePatient } = require('../controller/patient.controller')
 
-// Creando una nueva intancia del objeto Router 
+    // Creando una nueva intancia del objeto Router 
 const patientRoutes = Router();
-// para la ruta raiz se manejan las operaciones GET
+    // para la ruta raiz se manejan las operaciones GET
 patientRoutes.route('/')
     // Obtener todos los pacientes
     .get(getPatients)

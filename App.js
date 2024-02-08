@@ -36,7 +36,11 @@ class App {
     // si la app esta alojada en /patients se debe de enrutar el manejo de estas solicitudes al objeto patientRoutes.
     this.app.use('/patients', patientRoutes);
     // manejador de solicitud GET para la ruta raiz('/') que devuelve un msj con un estado HTTP 200
-    this.app.get('/', (req = Request, res = Response) => res.status(Code.OK).send( new HttpResponse(Code.OK, Status.OK, 'Welcome to the patients API V1.0')))
+    this.app.get('/', (req = Request, res = Response) => 
+        res.status(Code.OK)
+        .send( new HttpResponse(Code.OK, Status.OK, 
+          'Welcome to the patients API V1.00'
+          )))
     // Maneja todas las solicitudes a cualquier otra ruta que no este definida anteriormente, en ete caso devuelve un msh indicando que la ruta no se encontro status(404) con un msj definido en la propiedad 'ROUTE_NOT_FOUND' de la instancia de la clase.
     this.app.all('*', (req = Request, res = Response) => res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, this.ROUTE_NOT_FOUND)));
   }

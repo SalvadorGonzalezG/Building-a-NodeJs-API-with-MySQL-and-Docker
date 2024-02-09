@@ -6,12 +6,12 @@ USE patientsdb;
     -- Eliminar la tabla "patients" si existe
 DROP TABLE IF EXISTS patients;
     -- Crear una tabla llamada "patients"
-CREATE TABLE patients
+CREATE TABLE Patients
 (
     -- Columna para el ID de tipo BIGINT sin signo que no puede ser nulo y se autoincrementa
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
-    first_name VARCHAR(255) DEFAULT NULL,
+    first_name VARCHAR(255) DEFAULT NULL ,
     last_name VARCHAR(255) DEFAULT NULL,
     email VARCHAR(255) DEFAULT NULL,
     address VARCHAR(255) DEFAULT NULL,

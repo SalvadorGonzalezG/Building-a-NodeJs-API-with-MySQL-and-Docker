@@ -1,6 +1,6 @@
 
     // permite utilizar esta funcion para crear un grupo de conexiones a una base de datos MySQL utilizando promesas en lugar de devoluciones de llamada mejora la legibilidad y la facilidad de uso en codigo asincrono en entornos Node.js
-    const { createPool } = require("mysql2/promise");
+    const mysql  = require("mysql2/promise");
     //Es una libreria que permite cargar variables de entorno desde un archivo ".env" en Node.Js
     const dotenv = require("dotenv");
 
@@ -9,7 +9,7 @@
     // f: llamada connection f: asincrona devuelve una promesa establece una conexion a la DB MySQL
     const connection = async () => {
     // crea un grupoo de conexiones a la DB MySQL utilizando las variables de entorno cargadas desde el archivo .env
-        const pool = await createPool({
+        const pool = await mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,

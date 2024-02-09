@@ -3,6 +3,7 @@
     const mysql  = require("mysql2/promise");
     //Es una libreria que permite cargar variables de entorno desde un archivo ".env" en Node.Js
     const dotenv = require("dotenv");
+    
 
     // Carga las variables de entorno definidas en un archivo .env
     dotenv.config();

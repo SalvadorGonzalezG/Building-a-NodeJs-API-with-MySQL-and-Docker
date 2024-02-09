@@ -1,4 +1,5 @@
 const { Request, Response } = require("express")
+const { v4:uuidv4 } = require("uuid") //importa la v4 de la paqueteria uuid para generar uuids de forma dinamica 
 const Patient = require("../interface/patient")
 const connection = require("../config/mysql.config")
 const QUERY = require("../query/patient.query")
@@ -31,64 +32,33 @@ const getPatients = async (req = Request, res = Response) => {
 };
 
 // f: asincrona que maneja solicitudes para recuperar informacion sobre un paciente especifico.
-const getPatient = async (req = Request, res = Response) => {
-    console.info(`[${new Date().toLocaleString()}] Incoming ${req.method}${req.originalUrl} Request from ${req.rawHeaders[0]} ${req.rawHeaders[1]}`)
+// Definimos una funcion asincrona para recuperar un paciente por su id de la base de datos de mysql
+const getPatient = async(req, res) => {
+    // codigo envuelto en un bloque try-catch para el manejo de errores
     try {
-        const pool = await connection();
-        //Realiza una consulta a DB para recuperar info sobre un paciente especifico
-        const [result] = await pool.query(QUERY.CREATE_PATIENT, [req.params.patientId]);
-        // Verifica si se a encontrado algun paciente a la base de datos si result.length >0 significa que a encontrado almenos un paciente.
-        if (result.length > 0) {
-            // si a encontrado un paciente devuelve un status200 y los detalles del paciente en el cuerpo de la respuesta.
-            return res.status(Code.OK)
-                .send(new HttpResponse(Code.OK, Status.OK, 'Patient retrieved', result[0]));
+    // Se conecta a la DB.
+    const pool = await connection();
+    // Obtiene el id del paciente de los parametros de la solicitud
+    const patientId = req.params.patientId;
+    // consultamos MySQL para obtener informacion del paciente con el ID proporcionado.
+    const query = `SELECT * FROM patients WHERE id = ?`;
+    // Ejecutamos la consulta y almacenamos los resultado en la variable result.
+   const [result] = await pool.query(query, [patientId]);
+        if (result.length>0){
+    // Si se encontraron resultados, devuelve una respuesta exitosa con un msj y el paciente que se recupero.
+            return res.status(Code.OK).send(new HttpResponse(Code.OK, Status.OK, 'Paciente Recuperado de DB', result))
         } else {
-            // De lo contrario devuelve una respuesta con un estado HTTP 404.
-            return res.status(Code.NOT_FOUND)
-                .send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
+    // Si no se encontraron resultados devuelve un msj de no encontrado
+            return res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
         }
-        // Maneja cualquier error que ocurra durant el proceso anterior. 
-    } catch (error) {
-        console.error(error);
-        return res.status(Code.INTERNAL_SERVER_ERROR)
-            .send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'A ocurrido un error'));
+    }catch (error) {
+        // Si ocurre un error durante la ejecucion de la funcion, maneja el error y devuelve un msj del error interno del servidor.
+        console.error(error)
+        return res.status(Code.INTERNAL_SERVER_ERROR).send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'A ocurrido un error'));
     }
-};
+} 
 
     // funcion asincrona para crear un nuevo paciente en la DB.
-
-    /*const createPatient = async (patientData, res) => {
-    try {
-    // Conexion con la base de datos.
-    const pool = await connection();
-    // Consulta a la DB para insertar un nuevo paciente a la tabla "patients"
-    const mysql2 = 'INSERT INTO patients (first_name, last_name, email, address, diagnosis, phone, status, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    // Ejecucion de la consulta con los datos proporcionados del paciente.
-    const [result] = await pool.query(mysql2, [
-            patientData.first_name,
-            patientData.last_name,
-            patientData.email,
-            patientData.address,
-            patientData.diagnosis,
-            patientData.phone,
-            patientData.status,
-            patientData.image_url
-        ]);
-    // Obtencion del ID del paciente recin creado.
-    const patientId = result.insertId
-
-    console.log(`el paciente con id:${patientId} a sido creado`)
-    
-    // respuesta al cliente indicando que el paciente fue creado exitosamente.
-    return res.status(Code.CREATED).send(new HttpResponse(Code.CREATED, Status.CREATED, 'Patient created', patientId)); 
-        
-} catch(error) {
-    // Manejo de errores: registro del error en la consola y respuesta al cliente con un msj de error.
-    console.error(error);
-    return res.status(Code.INTERNAL_SERVER_ERROR).send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'Ha ocurrido un error'));
-
-    }
-}*/
 const createPatient = async (req, res) => {
     // Codigo envuelto en un bloque try-catch para el manejo de erres, si ocurre un error dentro del bloque try, se captura y se maneja en el bloque catch.
     try {
@@ -96,13 +66,14 @@ const createPatient = async (req, res) => {
      const patientData = req.body;
     // Se establece la conexion con la base de datos. la f: connection es llamada de forma asincrona
     const pool = await connection();
+    
     // Se define una Consulta a la DB para insertar un nuevo paciente a la tabla "patients"
     const query = 'INSERT INTO patients (first_name, last_name, email, address, diagnosis, phone, status, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     
     // Ejecucion de la consulta SQL usando pool(conexiones a la db), los valores para la consulta se pasan como un array en el segundo argumento de pool.query()
     // el resultado de la consulta se almacena el 'result'
     const [result] = await pool.query( query,
-        [
+        [   
             patientData.first_name,
             patientData.last_name,
             patientData.email,
@@ -114,10 +85,11 @@ const createPatient = async (req, res) => {
         
 ])
     // Se obtiene el ID del paciente recien creado.
-const Id = result.patientId;
-    console.log(`el paciente con ID: ${Id} a sido creado Exitosamente.`)
+  const patientId = result.insertId;
+
+    console.log(`el paciente ${patientData.first_name} con ID: ${patientId} a sido creado Exitosamente.`)
     // respuesta al cliente indicando que el paciente fue creado exitosamente.
-return res.status(Code.CREATED).send( new HttpResponse(Code.CREATED, Status.CREATED, 'PACIENTE CREADO EXITOSAMENTE.', Id));
+return res.status(Code.CREATED).send( new HttpResponse(Code.CREATED, Status.CREATED, 'PACIENTE CREADO EXITOSAMENTE.', patientId));
     // Manejo de errores: registro del error en la consola y respuesta al cliente con un msj de error.
 } catch(error){
     console.error(error)

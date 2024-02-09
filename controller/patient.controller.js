@@ -90,15 +90,17 @@ const getPatient = async (req = Request, res = Response) => {
     }
 }*/
 const createPatient = async (req, res) => {
+    // Codigo envuelto en un bloque try-catch para el manejo de erres, si ocurre un error dentro del bloque try, se captura y se maneja en el bloque catch.
     try {
+    // Se extraen los datos del paciente de la solicitud HTTP. se asume que los datos del paciente estan incluidos en el cuerpo de la solicitud 'req.body'.
      const patientData = req.body;
-    
-    // Conexion con la base de datos.
+    // Se establece la conexion con la base de datos. la f: connection es llamada de forma asincrona
     const pool = await connection();
-    // Consulta a la DB para insertar un nuevo paciente a la tabla "patients"
+    // Se define una Consulta a la DB para insertar un nuevo paciente a la tabla "patients"
     const query = 'INSERT INTO patients (first_name, last_name, email, address, diagnosis, phone, status, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    // Ejecucion de la consulta con los datos proporcionados del paciente.
     
+    // Ejecucion de la consulta SQL usando pool(conexiones a la db), los valores para la consulta se pasan como un array en el segundo argumento de pool.query()
+    // el resultado de la consulta se almacena el 'result'
     const [result] = await pool.query( query,
         [
             patientData.first_name,
@@ -111,7 +113,7 @@ const createPatient = async (req, res) => {
             patientData.image_url
         
 ])
-    // Obtencion del ID del paciente recien creado.
+    // Se obtiene el ID del paciente recien creado.
 const Id = result.patientId;
     console.log(`el paciente con ID: ${Id} a sido creado Exitosamente.`)
     // respuesta al cliente indicando que el paciente fue creado exitosamente.

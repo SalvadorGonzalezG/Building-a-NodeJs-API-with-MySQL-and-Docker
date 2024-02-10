@@ -137,23 +137,33 @@ const updatePatient = async (req, res) => {
     }
 };
 
-// f: que maneja una solicitud para eliminar un paciente 
-const deletePatient = async (req = Request, res = Response) => {
-    console.info(`[${new Date().toLocaleString()}] Incoming ${req.method}${req.originalUrl} Request from ${req.rawHeaders[0]} ${req.rawHeaders[1]}`)
+// f: que maneja una solicitud para eliminar un paciente de la DB segun su ID el cual es proporcionado en los parametros de la solicitud. 
+const deletePatient = async (req, res) => {
+    
     try {
+    // Establece la conexión con la base de datos.
         const pool = await connection();
-        // ejecuta una consulta  SQL para seleccionar un paciente especifico utilizando el ID del paciente proporcionado en los parametros de la solicitud
-        const result = await pool.query(QUERY.SELECT_PATIENT, [req.params.patientId]);
-        if (result[0].length > 0) {
-            const result = await pool.query(QUERY.DELETE_PATIENT, [req.params.patientId])
-            // si el paciente se elimina correctamente, se envia una respuesta con un estado HTTP 200 y un msj indicando que el paciente se a eliminado con exito
-            return res.status(Code.OK)
-                .send(new HttpResponse(Code.OK, Status.OK, 'Patient deleted'));
+    // Obtiene el ID de los parametros de la solicitud
+        const patientId = req.params.patientId;
+    // Defina una consulta SQL que se utiliza para selecciona registros de la tabla patients segun su ID
+        const query1 = 'SELECT * FROM patients WHERE id = ?'
+    // Define una consulta SQl que se utiliza para eliminar un registro de la tabla patients con la condicion que solo se eliminaran los registros donde el valor de la columna ID sea igual al valor proporcionado
+        const query2 = 'DELETE FROM patients WHERE id = ?'
+        
+    // ejecuta una consulta  SQL para seleccionar un paciente especifico utilizando el ID del paciente proporcionado en los parametros de la solicitud.
+        const [result] = await pool.query(query1, [patientId]);
+        
+        if (result.length > 0) {
+    // Si se encuentra almenos un paciente con el Id proporcionado ejecuta una consulta  SQL para eliminarlo.
+            const deleteResult = await pool.query(query2, [patientId])
+    // Si el paciente se elimina correctamente, se envia una respuesta con un estado HTTP 200 y un msj indicando que el paciente se a eliminado con exito
+            return res.status(Code.OK).send(new HttpResponse(Code.OK, Status.OK, 'Patient deleted'));
+    // Caso contrario.
         } else {
-            return res.status(Code.NOT_FOUND)
-                .send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
+    // Si no se encuentra ningun paciente con el ID proporcionado, devuelve un msj: "Patient not found" 
+            return res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
         }
-
+    // Maneja cualquier error que ocurra dentro del bloque try.
     } catch (error) {
         console.error(error);
         return res.status(Code.INTERNAL_SERVER_ERROR)

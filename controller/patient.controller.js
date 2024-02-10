@@ -103,24 +103,33 @@ return res.status(Code.CREATED).send( new HttpResponse(Code.CREATED, Status.CREA
     }
 }
     
-
-// Definimos una f: llamada updatePatient que maneja solicitudes para actualizar informacion sobre un paciente.
-const updatePatient = async (req = Request, res = Response) => {
-    console.info(`[${new Date().toLocaleString()}] Incoming ${req.method}${req.originalUrl} Request from ${req.rawHeaders[0]} ${req.rawHeaders[1]}`)
-    let patient = { ...req.body }
+    // Definimos una funcion que actualiza datos de un paciente en la DB segun su ID el cual es proporcionado en los parametros de la solicitud.
+const updatePatient = async (req, res) => {
+    // Copia los datos del cuerpo de la solicitud a el objeto pacient.
+    let patient = {...req.body}
+    // Definimos bloque try-catch para el manejo de errores.
     try {
+    // Establecemos la conexión con la base de datos.
         const pool = await connection();
-        const [result] = await pool.query(QUERY.SELECT_PATIENT, [req.params.patientId]);
-        // verifica si se a encontrado ulmenos un paciente en DB si se encuentra alguno se procede con la actualizacion
+    // Obtiene el ID del paciente de los parametros de la solicitud.
+        const patientId = req.params.patientId;
+    // Consultamos la BD para seleccionar al paciente con el ID proporcionado
+        const query = 'SELECT * FROM patients WHERE id = ?'
+    // Definimos la consulta  SQL para actualizar los datos del paciente.
+        const querys = 'UPDATE patients SET first_name = ?, last_name = ?, email = ?, address = ?, diagnosis = ?, phone = ?, status = ?, image_url = ? WHERE id = ?'
+    // Ejecuta la consulta para seleccionar al paciente con el ID proporcionado
+        const [result] = await pool.query(query, [req.params.patientId]);
+    // verifica si se encontro al menos un paciente.
         if (result.length > 0) {
-            const [updateResult] = await pool.query(QUERY.UPDATE_PATIENT, [...Object.values(patient), req.params.patientId])
-            return res.status(Code.OK)
-                .send(new HttpResponse(Code.OK, Status.OK, 'Patient update', { ...patien, id: req.params.patientId }));
+    // Ejecuta la consulta para actualizar los datos del paciente con los nuevos datos enviados
+            const [updateResult] = await pool.query(querys, [...Object.values(patient), patientId])
+    // Devuelve una respuesta exitosa con los datos del paciente actualizados
+            return res.status(Code.OK).send(new HttpResponse(Code.OK, Status.OK, 'patient update', {...patient, id:req.params.patientId}));
         } else {
-            return res.status(Code.NOT_FOUND)
-                .send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
+    // Caso contrario si no se encontro ningun paciente devuelve un msj "pacient not found"
+            return res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, 'Patient not found'));
         }
-
+    // Maneja cualquier error que ocurra dentro del proceso.
     } catch (error) {
         console.error(error);
         return res.status(Code.INTERNAL_SERVER_ERROR)

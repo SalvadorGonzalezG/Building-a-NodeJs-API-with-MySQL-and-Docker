@@ -1,4 +1,4 @@
-const { Request, Response } = require("express")
+const { Request, Response, query } = require("express")
 const { v4:uuidv4 } = require("uuid") //importa la v4 de la paqueteria uuid para generar uuids de forma dinamica 
 const Patient = require("../interface/patient")
 const connection = require("../config/mysql.config")
@@ -12,22 +12,28 @@ const { FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } = require("mysql
 //   CRUD que interactuara con una base de datos de pacientes atravez de una API HTTP
 
 
-// Funcion asincrona maneja solicitudes para recuperar pacientes.
-const getPatients = async (req = Request, res = Response) => {
-    console.info(`[${new Date().toLocaleString()}] Incoming ${req.method}${req.originalUrl} Request from ${req.rawHeaders[0]} ${req.rawHeaders[1]}`)
+// Funcion asincrona maneja solicitudes para recuperar todos los pacientes.
+const getPatients = async (req, res) => {
     try {
-        // establece una conexion a una DB utilizando la f:connection() se espera que devuelva una promesa
+        // Establece una conexion a una DB utilizando la f:connection() se espera que devuelva una promesa
         const pool = await connection();
-        // Realiza una consulta a la DB para recuperar pacientes utilizando una consulta almacenada la constante QUERY.SELECT_PATIENTS, espera el resultado de la consulta y lo asigna a la variable 'result'
-        const [result] = await pool.query(QUERY.SELECT_PATIENTS);
-        return res.status(Code.OK)
-            .send(new HttpResponse(Code.OK, Status.OK, 'Patients retrieved', result));
+        // Definimos la consulta SQL para recuperar todos los pacientes de la DB ordenados por fecha de creacion y de forma decendento limitadoa 50 registros.
+        const query = 'SELECT * FROM patients ORDER BY created_at DESC LIMIT 50'
+        // Realiza una consulta a la DB para recuperar pacientes utilizando la consulta definida anteriormente , espera el resultado de la consulta y lo asigna a la variable 'allPatients'
+        const [allPatients] = await pool.query(query);
+        // Comprueba si se encontraron pacientes en la Db.
+        if(allPatients.length>0){
+        // Si se encontraron pacientes, devuelve una respuesta exitosa con un msj y los pacientes recuperados.
+            return res.status(Code.OK).send(new HttpResponse(Code.OK, Status.OK, "PACIENTES RECUPERADOS CON EXITO", allPatients))
+        } else {
+        // Si no se encontraron pacientes, devuelve un msj que dice que no se encontraron pacientes.
+            return res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, "No se econtraron pacientes"))
+        } 
         // maneja cualquier error que ocurra en el proceso anterior.
     } catch (error) {
         console.error(error);
         //devuelve una respuesta al cliente con un estado HTTP500 
-        return res.status(Code.INTERNAL_SERVER_ERROR)
-            .send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'A ocurrido un error'));
+        return res.status(Code.INTERNAL_SERVER_ERROR).send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'A ocurrido un error'));
     }
 };
 

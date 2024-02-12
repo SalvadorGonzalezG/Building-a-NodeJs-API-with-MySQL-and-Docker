@@ -13,7 +13,7 @@ class App {
     // PROPIEDADES DE CLASE (APLICATION RUNNING & ROUTE_NOT_FOUND)
   APLICATION_RUNNING= 'Application is running on:';
   ROUTE_NOT_FOUND = 'Route does not exist on the server';
-  constructor(port = process.env.SERVER_PORT || 3000 ){
+  constructor(port = process.env.PORT || 3000 ){
     this.port = port;
     this.app = express();
     this._middleware();
@@ -22,7 +22,7 @@ class App {
   // metodo de la clase App que utiliza el metodo listen() de la instancia de la aplicacion de express(this.app) para iiciar el puerto especificado (this.port)
   listen() {
     this.app.listen(this.port)
-    console.info(`${this.APLICATION_RUNNING} ${ip.address()}:${this.port}`)
+    console.info(`${this.APLICATION_RUNNING} localhost:${this.port}`)
   }
   // metodo llamado en la inicializacion de la aplicacion de express
   // utiliza el middleware 'cors' que permitiran todas las solicitudes desde cuaquier origen
@@ -39,7 +39,7 @@ class App {
     this.app.get('/', (req = Request, res = Response) => 
         res.status(Code.OK)
         .send( new HttpResponse(Code.OK, Status.OK, 
-          'Welcome to the patients API V1.00'
+          'Welcome to the patients API V.1.00'
           )))
     // Maneja todas las solicitudes a cualquier otra ruta que no este definida anteriormente, en ete caso devuelve un msh indicando que la ruta no se encontro status(404) con un msj definido en la propiedad 'ROUTE_NOT_FOUND' de la instancia de la clase.
     this.app.all('*', (req = Request, res = Response) => res.status(Code.NOT_FOUND).send(new HttpResponse(Code.NOT_FOUND, Status.NOT_FOUND, this.ROUTE_NOT_FOUND)));

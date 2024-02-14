@@ -35,7 +35,7 @@ const getPatients = async (req, res) => {
         //devuelve una respuesta al cliente con un estado HTTP500 
         return res.status(Code.INTERNAL_SERVER_ERROR).send(new HttpResponse(Code.INTERNAL_SERVER_ERROR, Status.INTERNAL_SERVER_ERROR, 'A ocurrido un error'));
     }
-};
+}; 
 
 // f: asincrona que maneja solicitudes para recuperar informacion sobre un paciente especifico.
 // Definimos una funcion asincrona para recuperar un paciente por su id de la base de datos de mysql

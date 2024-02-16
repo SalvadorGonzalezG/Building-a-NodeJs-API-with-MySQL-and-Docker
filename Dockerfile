@@ -5,7 +5,7 @@ FROM node:latest
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 # Copia los archivos del proyecto al directorio de trabajo del contenedor
-COPY package.json .
+COPY package*.json ./
 
 # Instala las dependencias del proyecto
 RUN npm install
